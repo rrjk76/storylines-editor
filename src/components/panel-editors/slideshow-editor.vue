@@ -23,173 +23,18 @@
             }}</span>
         </div>
         <hr class="border-solid border-t-2 border-gray-300 my-2" />
-        <div class="w-full lg:w-4/5 max-h-96 overflow-y-auto mt-5 border border-gray-400 rounded-md">
-            <table class="w-full border-separate">
-                <thead class="bg-white sticky top-0 z-10">
-                    <tr style="top: 2px" class="table-header sticky z-20">
-                        <th
-                            style="width: 10%; text-align: left !important"
-                            class="rounded-tl"
-                            :aria-label="$t('editor.slideshow.label.slideNumber')"
-                        ></th>
-                        <th
-                            style="width: 40%; text-align: left !important"
-                            :aria-label="$t('editor.slideshow.label.slideNumber')"
-                        >
-                            {{ $t('editor.slideshow.label.slideNumber') }}
-                        </th>
-                        <th style="width: 20%">{{ $t('editor.slideshow.label.type') }}</th>
-                        <th style="width: 30%" class="rounded-tr">{{ $t('dynamic.panel.actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-if="panel.items.length > 0"
-                        class="table-contents"
-                        style="cursor: default !important"
-                        v-for="(item, idx) in panel.items"
-                        :key="idx"
-                        :class="{
-                            'bg-gray-100': idx % 2 !== 0,
-                            'bg-blue-200 hover-editing':
-                                editingStatus !== 'none' && editingStatus !== 'create' && editingIdx === idx
-                        }"
-                    >
-                        <td
-                            class="px-0.5 flex flex-col lg:flex-row gap-0.5 justify-center items-center"
-                            :class="{ 'rounded-bl': idx === panel.items.length - 1 }"
-                        >
-                            <button
-                                :disabled="idx === 0 || editingStatus === 'edit'"
-                                @click="moveSlideUp(idx)"
-                                style="border: none !important; padding-left: 0.375rem; padding-right: 0.375rem"
-                                class="respected-standard-button respected-transparent-button"
-                                v-tippy="{
-                                    delay: '200',
-                                    placement: 'top',
-                                    content: $t('editor.slides.toc.moveSlideUp'),
-                                    touch: ['hold', 500]
-                                }"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                                    x="0px"
-                                    y="0px"
-                                    viewBox="0 0 122.88 66.91"
-                                    style="enable-background: new 0 0 122.88 66.91"
-                                    xml:space="preserve"
-                                    height="14"
-                                    width="14"
-                                    class="fill-current"
-                                >
-                                    <g>
-                                        <path
-                                            d="M11.68,64.96c-2.72,2.65-7.08,2.59-9.73-0.14c-2.65-2.72-2.59-7.08,0.13-9.73L56.87,1.97l4.8,4.93l-4.81-4.95 c2.74-2.65,7.1-2.58,9.76,0.15c0.08,0.08,0.15,0.16,0.23,0.24L120.8,55.1c2.72,2.65,2.78,7.01,0.13,9.73 c-2.65,2.72-7,2.78-9.73,0.14L61.65,16.5L11.68,64.96L11.68,64.96z"
-                                        />
-                                    </g>
-                                </svg>
-                            </button>
-                            <button
-                                :disabled="idx === panel.items.length - 1 || editingStatus === 'edit'"
-                                @click="moveSlideDown(idx)"
-                                style="border: none !important; padding-left: 0.375rem; padding-right: 0.375rem"
-                                class="respected-standard-button respected-transparent-button rotate-180 transform"
-                                v-tippy="{
-                                    delay: '200',
-                                    placement: 'top',
-                                    content: $t('editor.slides.toc.moveSlideDown'),
-                                    touch: ['hold', 500]
-                                }"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                                    x="0px"
-                                    y="0px"
-                                    viewBox="0 0 122.88 66.91"
-                                    style="enable-background: new 0 0 122.88 66.91"
-                                    xml:space="preserve"
-                                    height="14"
-                                    width="14"
-                                    class="fill-current"
-                                >
-                                    <g>
-                                        <path
-                                            d="M11.68,64.96c-2.72,2.65-7.08,2.59-9.73-0.14c-2.65-2.72-2.59-7.08,0.13-9.73L56.87,1.97l4.8,4.93l-4.81-4.95 c2.74-2.65,7.1-2.58,9.76,0.15c0.08,0.08,0.15,0.16,0.23,0.24L120.8,55.1c2.72,2.65,2.78,7.01,0.13,9.73 c-2.65,2.72-7,2.78-9.73,0.14L61.65,16.5L11.68,64.96L11.68,64.96z"
-                                        />
-                                    </g>
-                                </svg>
-                            </button>
-                        </td>
-                        <td style="text-align: left !important" class="truncate">
-                            <span class="ml-2 text-gray-600">{{ `${idx + 1}. ` }}</span>
-                            {{ (item as any).title || $t('editor.slideshow.noTitle') }}
-                        </td>
-                        <td>{{ $t(`editor.slide.panel.type.${item.type}`) }}</td>
-                        <td :class="{ 'rounded-br': idx === panel.items.length - 1 }">
-                            <span
-                                @click="editItem(idx)"
-                                @keydown.enter="editItem(idx)"
-                                class="slideshow-text-button underline cursor-pointer rounded-sm"
-                                tabindex="0"
-                                >{{ $t('editor.chart.label.edit') }}</span
-                            >
-                            |
-                            <a
-                                @click="editingStatus !== 'edit' && deleteItem(idx)"
-                                @keydown.enter="editingStatus !== 'edit' && deleteItem(idx)"
-                                class="slideshow-text-button underline rounded-sm"
-                                :class="[
-                                    editingStatus !== 'edit'
-                                        ? 'text-red-700 cursor-pointer'
-                                        : 'text-gray-600 cursor-not-allowed'
-                                ]"
-                                tabindex="0"
-                                >{{ $t('editor.remove') }}</a
-                            >
-                        </td>
-                    </tr>
-                    <tr v-else>
-                        <td class="self-center text-center italic" colspan="4">
-                            {{ $t('editor.slideshow.noSlides') }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <!-- add item button -->
-        <button
-            class="respected-standard-button w-full lg:w-4/5 max-h-96 bg-gray-100 border border-gray-400 hover:bg-gray-200"
-            style="margin-top: 1.25rem; justify-content: start !important"
-            @click="this.changeEditStatus()"
-        >
-            <svg
-                height="18px"
-                width="18px"
-                viewBox="0 0 23 21"
-                xmlns="http://www.w3.org/2000/svg"
-                v-if="editingStatus !== 'create'"
-            >
-                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-            </svg>
-            <svg
-                class="fill-current"
-                height="18px"
-                width="18px"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 352 512"
-                v-else
-            >
-                <path
-                    d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
-                ></path>
-            </svg>
-            <span class="px-2">
-                {{ editingStatus === 'create' ? $t('editor.cancel') : $t('editor.slideshow.label.create') }}
-            </span>
-        </button>
-
+        <table-component
+            :panel="panel"
+            :panelItems="panel.items"
+            :dynamicSelected="false"
+            :editingSlide="editingIdx"
+            :editingStatus="editingStatus"
+            @move-item-up="moveSlideUp"
+            @move-item-down="moveSlideDown"
+            @edit-item="editItem"
+            @delete-item="deleteItem"
+            @change-edit-status="changeEditStatus"
+        />
         <br />
         <hr />
         <br />
@@ -313,6 +158,7 @@ import ImageEditorV from './image-editor.vue';
 import TextEditorV from './text-editor.vue';
 import MapEditorV from './map-editor.vue';
 import VideoEditorV from './video-editor.vue';
+import TableComponentV from '../support/table-component.vue';
 
 import { useProductStore } from '@/stores/productStore';
 
@@ -322,7 +168,8 @@ import { useProductStore } from '@/stores/productStore';
         'image-editor': ImageEditorV,
         'text-editor': TextEditorV,
         'map-editor': MapEditorV,
-        'video-editor': VideoEditorV
+        'video-editor': VideoEditorV,
+        'table-component': TableComponentV
     }
 })
 export default class SlideshowEditorV extends Vue {
@@ -374,9 +221,7 @@ export default class SlideshowEditorV extends Vue {
         });
     }
 
-    deleteItem(item: number): void {
-        const panel = this.panel.items.find((panel: BasePanel, idx: number) => idx === item);
-
+    deleteItem(panel: BasePanel, item: number): void {
         // Update source counts based on which panel is removed.
         this.productStore.removeSourceCounts(panel as BasePanel);
 
@@ -460,6 +305,7 @@ export default class SlideshowEditorV extends Vue {
         }
 
         this.editingStatus = 'none';
+        this.editingIdx = -1;
     }
 
     saveChanges(): void {
@@ -490,59 +336,8 @@ label {
 }
 
 select {
-    border: 1px black solid;
-    background: white;
-    padding: 0.25rem 0.5rem;
-}
-
-.table-header th {
-    text-align: center;
-    background-color: #ddd;
-    padding: 5px 10px;
-}
-
-.table-contents td {
-    text-align: center;
-    padding: 5px 10px;
-}
-
-.table-contents:hover {
-    background-color: #eee;
-    cursor: pointer;
-}
-
-.table-add-row th {
-    vertical-align: top;
-    text-align: center;
-    border-top: 1px solid #ddd;
-    padding: 5px;
-}
-
-.table-add-row input[type='text'],
-.table-add-row select,
-.table-add-row button {
-    width: 150px !important;
-    text-align: center;
-    font-weight: normal;
-    border: 1px solid black;
-    padding: 2px !important;
-    margin-top: 0 !important;
-}
-
-.hover-editing:hover {
-    background-color: rgb(219, 234, 254);
-}
-
-select {
     border: 1px solid #a1a1a1;
     background: white;
     padding: 0.25rem 0.5rem;
-}
-
-.slideshow-text-button:focus {
-    outline: 2px solid royalblue;
-    z-index: 2;
-    outline-offset: 2px;
-    transition-duration: 0.075s;
 }
 </style>
